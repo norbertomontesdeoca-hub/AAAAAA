@@ -169,6 +169,10 @@ const App: React.FC = () => {
     return { name: currentView.charAt(0).toUpperCase() + currentView.slice(1), color: '#E44232' };
   }, [currentView, projects]);
 
+  const getProjectColor = (projectId: string) => {
+    return projects.find(p => p.id === projectId)?.color || '#e5e7eb';
+  };
+
   return (
     <div className="flex h-screen bg-white overflow-hidden text-[#202020]">
       {/* Mobile Backdrop */}
@@ -268,7 +272,13 @@ const App: React.FC = () => {
                 {/* Pending Tasks */}
                 <div className="space-y-px">
                   {filteredTasks.pending.map(task => (
-                    <TaskItem key={task.id} task={task} onToggle={() => toggleTask(task.id)} onDelete={() => deleteTask(task.id)} />
+                    <TaskItem 
+                      key={task.id} 
+                      task={task} 
+                      projectColor={getProjectColor(task.projectId)}
+                      onToggle={() => toggleTask(task.id)} 
+                      onDelete={() => deleteTask(task.id)} 
+                    />
                   ))}
                 </div>
 
@@ -278,7 +288,13 @@ const App: React.FC = () => {
                     <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Completadas</h4>
                     <div className="space-y-px opacity-60">
                       {filteredTasks.completed.map(task => (
-                        <TaskItem key={task.id} task={task} onToggle={() => toggleTask(task.id)} onDelete={() => deleteTask(task.id)} />
+                        <TaskItem 
+                          key={task.id} 
+                          task={task} 
+                          projectColor={getProjectColor(task.projectId)}
+                          onToggle={() => toggleTask(task.id)} 
+                          onDelete={() => deleteTask(task.id)} 
+                        />
                       ))}
                     </div>
                   </div>
@@ -413,8 +429,12 @@ const SidebarItem: React.FC<{ active: boolean; onClick: () => void; icon: React.
   </button>
 );
 
-const TaskItem: React.FC<{ task: Task; onToggle: () => void; onDelete: () => void }> = ({ task, onToggle, onDelete }) => (
-  <div className="flex items-start gap-4 py-3 group hover:bg-gray-50/50 px-2 rounded-xl transition-colors border-b border-gray-50 last:border-0">
+const TaskItem: React.FC<{ task: Task; projectColor: string; onToggle: () => void; onDelete: () => void }> = ({ task, projectColor, onToggle, onDelete }) => (
+  <div className="flex items-start gap-4 py-3 group hover:bg-gray-50/50 px-2 rounded-xl transition-colors border-b border-gray-50 last:border-0 relative overflow-hidden">
+    <div 
+      className="absolute left-0 top-1 bottom-1 w-1 rounded-full transition-opacity opacity-70"
+      style={{ backgroundColor: projectColor }}
+    />
     <button 
       onClick={onToggle}
       style={{ borderColor: task.isCompleted ? '#aaa' : PRIORITY_COLORS[task.priority] }}
@@ -429,4 +449,17 @@ const TaskItem: React.FC<{ task: Task; onToggle: () => void; onDelete: () => voi
         {task.dueDate && (
           <div className={`flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded ${new Date(task.dueDate) < new Date() && !task.isCompleted ? 'bg-red-50 text-red-500' : 'text-gray-400 bg-gray-50'}`}>
              <ICONS.Upcoming />
-             <span>{new Date(task
+             <span>{new Date(task.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
+          </div>
+        )}
+      </div>
+    </div>
+    <div className="opacity-0 group-hover:opacity-100 flex items-center gap-1 transition-opacity">
+       <button onClick={onDelete} className="p-2 hover:bg-red-50 rounded-lg text-gray-300 hover:text-red-500 transition-all">
+         <ICONS.Trash />
+       </button>
+    </div>
+  </div>
+);
+
+export default App;
