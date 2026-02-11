@@ -429,37 +429,55 @@ const SidebarItem: React.FC<{ active: boolean; onClick: () => void; icon: React.
   </button>
 );
 
-const TaskItem: React.FC<{ task: Task; projectColor: string; onToggle: () => void; onDelete: () => void }> = ({ task, projectColor, onToggle, onDelete }) => (
-  <div className="flex items-start gap-4 py-3 group hover:bg-gray-50/50 px-2 rounded-xl transition-colors border-b border-gray-50 last:border-0 relative overflow-hidden">
-    <div 
-      className="absolute left-0 top-1 bottom-1 w-1 rounded-full transition-opacity opacity-70"
-      style={{ backgroundColor: projectColor }}
-    />
-    <button 
-      onClick={onToggle}
-      style={{ borderColor: task.isCompleted ? '#aaa' : PRIORITY_COLORS[task.priority] }}
-      className={`mt-0.5 flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${task.isCompleted ? 'bg-gray-400' : 'hover:bg-gray-50'}`}
-    >
-      {task.isCompleted && <ICONS.Check />}
-    </button>
-    <div className="flex-1 min-w-0">
-      <h4 className={`text-sm font-medium transition-all ${task.isCompleted ? 'line-through text-gray-400' : 'text-[#202020]'}`}>{task.content}</h4>
-      {task.description && <p className="text-xs text-gray-500 mt-1 line-clamp-2 leading-relaxed">{task.description}</p>}
-      <div className="flex items-center gap-3 mt-2">
-        {task.dueDate && (
-          <div className={`flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded ${new Date(task.dueDate) < new Date() && !task.isCompleted ? 'bg-red-50 text-red-500' : 'text-gray-400 bg-gray-50'}`}>
-             <ICONS.Upcoming />
-             <span>{new Date(task.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
-          </div>
-        )}
+const TaskItem: React.FC<{ task: Task; projectColor: string; onToggle: () => void; onDelete: () => void }> = ({ task, projectColor, onToggle, onDelete }) => {
+  const priorityColor = PRIORITY_COLORS[task.priority];
+  
+  return (
+    <div className="flex items-start gap-4 py-3 group hover:bg-gray-50/50 px-2 rounded-xl transition-colors border-b border-gray-50 last:border-0 relative overflow-hidden">
+      {/* Barra lateral de Proyecto */}
+      <div 
+        className="absolute left-0 top-1 bottom-1 w-1 rounded-full transition-opacity opacity-70"
+        style={{ backgroundColor: projectColor }}
+      />
+      
+      {/* Círculo de Prioridad / Checkbox */}
+      <button 
+        onClick={onToggle}
+        style={{ 
+          borderColor: task.isCompleted ? '#aaa' : priorityColor,
+          backgroundColor: !task.isCompleted ? `${priorityColor}15` : 'transparent'
+        }}
+        className={`mt-0.5 flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${task.isCompleted ? 'bg-gray-400 border-gray-400 shadow-none' : 'hover:scale-110 shadow-sm'}`}
+      >
+        {task.isCompleted && <ICONS.Check />}
+      </button>
+
+      <div className="flex-1 min-w-0">
+        <h4 className={`text-sm font-medium transition-all ${task.isCompleted ? 'line-through text-gray-400' : 'text-[#202020]'}`}>{task.content}</h4>
+        {task.description && <p className="text-xs text-gray-500 mt-1 line-clamp-2 leading-relaxed">{task.description}</p>}
+        <div className="flex items-center gap-3 mt-2">
+          {task.dueDate && (
+            <div className={`flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded ${new Date(task.dueDate) < new Date() && !task.isCompleted ? 'bg-red-50 text-red-500' : 'text-gray-400 bg-gray-50'}`}>
+               <ICONS.Upcoming />
+               <span>{new Date(task.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
+            </div>
+          )}
+          {/* Badge de prioridad visual si se desea reforzar */}
+          {!task.isCompleted && task.priority < 4 && (
+             <span className="text-[9px] font-black uppercase tracking-tighter px-1.5 py-0.5 rounded bg-gray-50 border border-gray-100" style={{ color: priorityColor }}>
+               P{task.priority}
+             </span>
+          )}
+        </div>
+      </div>
+      
+      <div className="opacity-0 group-hover:opacity-100 flex items-center gap-1 transition-opacity">
+         <button onClick={onDelete} className="p-2 hover:bg-red-50 rounded-lg text-gray-300 hover:text-red-500 transition-all">
+           <ICONS.Trash />
+         </button>
       </div>
     </div>
-    <div className="opacity-0 group-hover:opacity-100 flex items-center gap-1 transition-opacity">
-       <button onClick={onDelete} className="p-2 hover:bg-red-50 rounded-lg text-gray-300 hover:text-red-500 transition-all">
-         <ICONS.Trash />
-       </button>
-    </div>
-  </div>
-);
+  );
+};
 
 export default App;
