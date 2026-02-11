@@ -1,0 +1,7 @@
+{
+  "name": "GenTask AI - Todoist Clone",
+  "description": "A high-performance task management application inspired by Todoist, featuring Gemini-powered natural language task parsing and smart productivity suggestions.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
