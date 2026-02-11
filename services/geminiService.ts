@@ -2,7 +2,16 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { Priority } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+// Acceso seguro a la API KEY para evitar que el script falle si process no está definido
+const getApiKey = () => {
+  try {
+    return process.env.API_KEY || '';
+  } catch (e) {
+    return '';
+  }
+};
+
+const ai = new GoogleGenAI({ apiKey: getApiKey() });
 
 export const parseNaturalLanguageTask = async (input: string, projects: { id: string, name: string }[]) => {
   try {
